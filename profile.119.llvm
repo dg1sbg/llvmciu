@@ -1,0 +1,136 @@
+#!/bin/bash
+# === GOENNINGER.NET ===
+# === P R O D U C T I O N    E N V I R O N M E N T ===
+
+# set -x
+ 
+# -----------------------------------------------------------------------------
+# LLVM AND CLANG ENV  PROFILE 
+# -----------------------------------------------------------------------------
+# $Header$
+
+# -----------------------------------------------------------------------------
+# SECTION 1 : GENERAL DEFINITIONS
+# -----------------------------------------------------------------------------
+
+LLVM_ROOT_DIR=/opt/langtools/llvm
+LLVM_BIN_DIR=$LLVM_ROOT_DIR/bin
+
+LLVM_CONFIG=$LLVM_BIN_DIR/llvm-config
+LLVM_CONFIG_DEBUG=${LLVM_CONFIG_DEBUG:-$LLVM_CONFIG}
+LLVM_CONFIG_RELEASE=${LLVM_CONFIG_RELEASE:-$LLVM_CONFIG}
+
+CLANG_ROOT_DIR=/opt/langtools/llvm/tools/clang
+CLANG_BIN_DIR=$CLANG_ROOT_DIR/bin
+
+CLANG=$CLANG_BIN_DIR/clang
+CLANGXX=$CLANG_BIN_DIR/clang++
+
+XCODE_SDK_PATH=`xcrun --show-sdk-path`
+XCODE_DEVELOPER_PATH=`xcode-select -p`
+BUILTIN_INCLUDES=$XCODE_DEVELOPER_PATH/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1
+
+# -----------------------------------------------------------------------------
+# SECTION 2 : CONFIGURATION - YOU SHOULD NOT NEED TO EDIT BELOW THIS LINE !!!
+# -----------------------------------------------------------------------------
+
+# *** CONFIG CHECK ***
+
+if [ -z ${LLVM_BIN_DIR+x} ]
+then
+  echo "*** LLVM Setup: ERROR: LLVM_BIN_DIR not set !!!"
+fi
+
+if [ -z ${CLANG_BIN_DIR+x} ]
+then
+  echo "*** CLANG Setup: ERROR: CLANG_BIN_DIR not set !!!"
+fi
+
+if [ -z ${BUILTIN_INCLUDES+x} ]
+then
+  echo "*** Xcode Setup: ERROR: BUILTIN_INCLUDES not set !!!"
+fi
+
+# *** XCODE SETUP ***
+
+if [ -d $BUILTIN_INCLUDES ]
+then
+  echo "*** Xcode Setup: BUILTIN_INCLUDES: Include path set to $BUILTIN_INCLUDES."
+  export BUILTIN_INCLUDES
+else
+  echo "*** Xcode Setup: BUILTIN_INCLUDES: ERROR: Invalid Include path $BUILTIN_INCLUDES."
+fi
+
+if [ -d $XCODE_SDK_PATH ]
+then
+  echo "*** Xcode Setup: SDK: path set to $XCODE_SDK_PATH."
+  export XCODE_SDK_PATH
+else
+  echo "*** Xcode Setup: SDK path: ERROR: Invalid path $XCODE_SDK_PATH."
+fi
+
+# *** LLVM SETUP *** 
+
+if [ -d $LLVM_BIN_DIR ]
+then
+  PATH=$LLVM_BIN_DIR:$PATH
+  echo "*** LLVM Setup: prepended $LLVM_BIN_DIR to PATH."
+else
+  echo "*** LLVM Setup: ERROR: Could not find $LLVM_BIN_DIR."
+fi
+
+if [ -x $LLVM_CONFIG ]
+then
+  export LLVM_CONFIG
+  echo "*** LLVM Setup: LLVM_CONFIG = $LLVM_CONFIG."
+else
+  echo "*** LLVM Setup: LLVM_CONFIG not set. File not found."
+fi
+
+if [ -x $LLVM_CONFIG_DEBUG ]
+then
+  export LLVM_CONFIG_DEBUG
+  echo "*** LLVM Setup: LLVM_CONFIG_DEBUG = $LLVM_CONFIG_DEBUG."
+else
+  echo "*** LLVM Setup: LLVM_CONFIG_DEBUG not set. File not found."
+fi
+
+if [ -f $LLVM_CONFIG_RELEASE ]
+then
+  export LLVM_CONFIG_RELEASE
+  echo "*** LLVM Setup: LLVM_CONFIG_RELEASE = $LLVM_CONFIG_RELEASE."
+else
+  echo "*** LLVM Setup: LLVM_CONFIG_RELEASE not set. File not found."
+fi
+
+# *** CLANG SETUP *** 
+
+if [ -d $CLANG_BIN_DIR ]
+then
+  PATH=$CLANG_BIN_DIR:$PATH
+  echo "*** CLANG Setup: prepended $CLANG_BIN_DIR to PATH."
+else
+  echo "*** CLANG Setup: ERROR: Could not find $CLANG_BIN_DIR."
+fi
+
+if [ -x $CLANG ]
+then
+  export CLANG
+  echo "*** CLANG Setup: CLANG = $CLANG."
+else
+  echo "*** CLANG Setup: ERROR: CLANG file not found."
+fi
+
+if [ -x $CLANGXX ]
+then
+  export CLANGXX
+  echo "*** CLANG Setup: CLANGXX = $CLANGXX."
+else
+  echo "*** CLANG Setup: ERROR: CLANGXX file not found."
+fi
+
+
+
+# -----------------------------------------------------------------------------
+# END OF FILE
+# -----------------------------------------------------------------------------
