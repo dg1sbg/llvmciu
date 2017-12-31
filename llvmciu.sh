@@ -15,6 +15,8 @@
 #               -c | --cleanup -> do cleanup on error
 #               -s | --src-cleaning -> do rm -rf on source directories
 #               -f | --force-cleanup -> do cleaning and cleanup
+#    	        -b | --build -> execute Build step
+#	        -i | --install -> execute Install step
 #
 #               Execution is also controlled by environment variables
 #
@@ -81,8 +83,8 @@ LLVM_CIU_CLONE_LIBCXX_SWITCH=${LLVM_CIU_CLONE_LIBCXX_SWITCH:-1}
 LLVM_CIU_CLONE_LIBCXXABI_SWITCH=${LLVM_CIU_CLONE_LIBCXXABI_SWITCH:-1}
 LLVM_CIU_CLONE_CLANGTOOLSEXTRA_SWITCH=${LLVM_CIU_CLONE_CLANGTOOLSEXTRA_SWITCH:-1}
 
-LLVM_CIU_BUILD_IT_SWITCH=${LLVM_CIU_BUILD_IT_SWITCH:-1}
-LLVM_CIU_INSTALL_IT_SWITCH=${LLVM_CIU_INSTALL_IT_SWITCH:-1}
+LLVM_CIU_BUILD_IT_SWITCH=${LLVM_CIU_BUILD_IT_SWITCH:-0}
+LLVM_CIU_INSTALL_IT_SWITCH=${LLVM_CIU_INSTALL_IT_SWITCH:-0}
 LLVM_CIU_DO_CLEANUP_SWITCH=0
 LLVM_CIU_DO_SRC_CLEANING_SWITCH=0
 
@@ -303,6 +305,14 @@ HANDLE_OPTIONS()
 		LLVM_CIU_DO_CLEANUP_SWITCH=1
 		shift # past argument
 		;;
+	    -b|--build)
+		LLVM_CIU_BUILD_IT_SWITCH=1
+		shift # past argument
+		;;
+	    -i|--install)
+		LLVM_CIU_INSTALL_IT_SWITCH=1
+		shift # past argument
+		;;
 	    *)    # unknown option
 		POSITIONAL+=("$1") # save it in an array for later
 		shift # past argument
@@ -397,7 +407,7 @@ trap "TRAP_HANDLER 14 CLEANUP_AND_EXIT"  14
 trap "TRAP_HANDLER 15 CLEANUP_AND_EXIT"  15
 
 TITLE
-HANDLE_OPTIONS
+HANDLE_OPTIONS $*
 
 BUILD_TOOLS_CHECK
 
@@ -409,15 +419,19 @@ fi
 
 if [ INTERACTIVE_MODE_P ]
 then
-    # TITLE
-    # echo "Mode Information:"
-    # echo
-    # echo "Interactive Mode: $LLVM_CIU_INTERACTIVE_MODE"
-    # echo "Debug: $LLVM_CIU_DEBUG"
-    # echo "DO SRC CLEANING: $LLVM_CIU_DO_SRC_CLEANING_SWITCH"
-    # echo "DO CLEANUP: $LLVM_CIU_DO_CLEANUP_SWITCH"
-    # echo
-    # WAIT_FOR_RETURN
+    TITLE
+    echo "Mode Information:"
+    echo
+    echo "Interactive Mode: $LLVM_CIU_INTERACTIVE_MODE"
+    echo "Debug: $LLVM_CIU_DEBUG"
+    echo
+    echo "Execute Build Step: $LLVM_CIU_BUILD_IT_SWITCH"
+    echo "Execute Install Step: $LLVM_CIU_INSTALL_IT_SWITCH"
+    echo
+    echo "Do Source Cleaning on Error: $LLVM_CIU_DO_SRC_CLEANING_SWITCH"
+    echo "Do Cleanup on Error: $LLVM_CIU_DO_CLEANUP_SWITCH"
+    echo
+    WAIT_FOR_RETURN
     TITLE
     echo "Configuration (1/2): Paths and Module Selection"
     echo
@@ -446,9 +460,6 @@ then
     echo
     echo "CCMAKE_OPTS  = "
     echo $CCMAKE_OPTS
-    echo
-    echo "LLVM_CIU_BUILD_IT_SWITCH .... = $LLVM_CIU_BUILD_IT_SWITCH"
-    echo "LLVM_CIU_INSTALL_IT_SWITCH .. = $LLVM_CIU_INSTALL_IT_SWITCH"
     echo
     WAIT_FOR_RETURN
 fi
@@ -578,7 +589,7 @@ then
 
     $CD $LLVM_CIU_BUILDDIR 2>/dev/null
     CHECKRC_EXIT $? "Could not change directory to $LLVM_CIU_BUILDDIR !"
-    $RMFF \* 2>/dev/null
+    $RMRF \* 2>/dev/null
 
     if [ `\ls | wc -l` -gt 0 ]
     then
@@ -588,14 +599,14 @@ then
     if [ INTERACTIVE_MODE_P ]
     then
 	$CCMAKE $CCMAKE_OPTS $LLVM_CIU_LLVM_SRCDIR
-	CHECKRC_EXIT $? "Could not complete ccmake successfully (RC=$RC) !"
+	CHECKRC_EXIT $? "Could not complete ccmake successfully - RC = $RC !"
     else
 	$CMAKE $CMAKE_OPTS
-	CHECKRC_EXIT $? "Could not complete cmake successfully (RC=$RC) !"    fi
+	CHECKRC_EXIT $? "Could not complete cmake successfully - RC = $RC !"    fi
     fi
     $NINJA 2>/dev/null
     RC=$?
-    CHECKRC_EXIT $RC "Could not build (RC=$RC) !"
+    CHECKRC_EXIT $RC "Could not build - RC = $RC !"
 fi
 
 if [ $LLVM_CIU_INSTALL_IT_SWITCH -ne 0 ]
