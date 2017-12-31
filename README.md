@@ -6,14 +6,14 @@
 
 ## What Is This?
 LLVMCIU is a bash shell script that makes cloning, building and installing LLVM and tools like Clang, libcxx, libcxxabi and stuff easy. It has an interactive mode where you can see which directories are selected and where the sources will be installed to and much more ... It is tested under macOS High Sierra only, but should work on any linux with bash shell.<br><br>
-If there is already source code cloned then the script will do a git pull. You may force cloning by specifying command line argument -d or --delete.
+If there is already source code cloned then the script will do a git pull. You may force cloning by specifying command line argument -d or --delete. <br>
+At any time you can press Ctrl-C - the scipt will cleanup any intermediate files and exit gracefully.
 
 ## Usage
-LLVMCIU is simply executed as <br>
-<pre>./llcmciu.sh</pre><br>
-The command line options are:<br>
+LLVMCIU is simply executed as
+<pre>./llcmciu.sh</pre>
+The command line options are:
 <pre>
-
  -n | --non-interactive -> Execute in batch mode
  -c | --cleanup         -> Do cleanup on error
  -s | --src-cleaning    -> Do rm -rf on source directories on error
@@ -21,8 +21,12 @@ The command line options are:<br>
  -d | --delete          -> Force deleting of sources and therefore force cloning
  -b | --build           -> Execute Build step
  -i | --install         -> Execute Install step
-
 </pre>
+
+## Screenshots
+
+<img src="https://github.com/dg1sbg/llvmciu/raw/master/screen1.png"/><br>
+<img src="https://github.com/dg1sbg/llvmciu/raw/master/screen2.png"/>
 
 ## License
 <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />LLVMCIU is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>. Any violation of this license will be prosecuted. German law applies in all cases and under all circumstances.
