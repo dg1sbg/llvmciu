@@ -580,16 +580,20 @@ then
 
     MSG " ... Building ... (This may take some time - please wait)"
     MSG
+    MSG " Build Directory: $LLVM_CIU_BUILDDIR"
+    MSG
 
     if [ ! -d $LLVM_CIU_BUILDDIR ]
     then
 	$MKDIR $LLVM_CIU_BUILDDIR 2>/dev/null
 	CHECKRC_EXIT $? "Could not create directory $LLVM_CIU_BUILDDIR !"
+	sleep 2
     fi
 
     $CD $LLVM_CIU_BUILDDIR 2>/dev/null
     CHECKRC_EXIT $? "Could not change directory to $LLVM_CIU_BUILDDIR !"
     $RMRF \* 2>/dev/null
+    sleep 2
 
     if [ `\ls | wc -l` -gt 0 ]
     then
@@ -607,6 +611,9 @@ then
     $NINJA 2>/dev/null
     RC=$?
     CHECKRC_EXIT $RC "Could not build - RC = $RC !"
+    MSG " ... Finished building."
+    MSG
+    sleep 2
 fi
 
 if [ $LLVM_CIU_INSTALL_IT_SWITCH -ne 0 ]
@@ -615,6 +622,9 @@ then
 
     MSG " ... Installing ... (This may take some time - please wait)"
     MSG
+    MSG
+    MSG " Install Directory: $LLVM_CIU_INSTDIR"
+    MSG
     if [ ! -d $LLVM_CIU_INSTDIR ]
     then
 	$MKDIR $LLVM_CIU_INSTDIR
@@ -622,16 +632,14 @@ then
     fi
     $CD $LLVM_CIU_INSTDIR
     CHECKRC_EXIT $? "Could not change directory to $LLVM_CIU_INSTDIR !"
-    $RMRF \*
+    $RMRF bin include lib libexec share
     $CD $LLVM_CIU_BUILDDIR
     $NINJA install 2>/dev/null
     RC=$?
     CHECKRC_EXIT $RC "Could not install (RC=$RC) !"
+    MSG " ... Finished installing."
+    MSG
 fi
 
-TITLE
-
-MSG " ... Finished installing."
-MSG
 MSG "READY."
 MSG
