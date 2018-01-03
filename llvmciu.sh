@@ -582,12 +582,12 @@ then
     MSG
     MSG " Build Directory: $LLVM_CIU_BUILDDIR"
     MSG
+	  sleep 2
 
     if [ ! -d $LLVM_CIU_BUILDDIR ]
     then
 	$MKDIR $LLVM_CIU_BUILDDIR 2>/dev/null
 	CHECKRC_EXIT $? "Could not create directory $LLVM_CIU_BUILDDIR !"
-	sleep 2
     fi
 
     $CD $LLVM_CIU_BUILDDIR 2>/dev/null
@@ -595,7 +595,8 @@ then
     $RMRF \* 2>/dev/null
     sleep 2
 
-    if [ `\ls | wc -l` -gt 0 ]
+    NR_ENTRIES=`\ls | wc -l`
+    if [ $NR_ENTRIES -gt 0 ]
     then
         CHECKRC_EXIT 1 "Could not delete contents of build directory $LLVM_CIU_BUILDDIR"
     fi
